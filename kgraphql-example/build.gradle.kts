@@ -97,7 +97,7 @@ publishing {
 
                 developers {
                     developer {
-                        id.set("pasitaf")
+                        id.set("tpasipanodya")
                         name.set("Tafadzea Pasipanodya")
                         email.set("tmpasipanodya@gmail.com")
                     }
