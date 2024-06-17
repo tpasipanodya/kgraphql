@@ -1,0 +1,34 @@
+name: 'CI Reports'
+on:
+  workflow_run:
+    workflows:
+      - 'CI'
+      - 'CI & CD'
+    types:
+      - completed
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    steps:
+      - name: Set Swap Space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 10
+      - name: Upload kgraphql Test Results
+        uses: dorny/test-reporter@v1.9.1
+        if: success() || failure()
+        with:
+          name: Test Results
+          path: kgraphql/build/test-results/test/*.xml
+          reporter: java-junit
+      - name: Upload kgraphql-ktor Test Results
+        uses: dorny/test-reporter@v1.9.1
+        if: success() || failure()
+        with:
+          name: Test Results
+          path: kgraphql-ktor/build/test-results/test/*.xml
+          reporter: java-junit

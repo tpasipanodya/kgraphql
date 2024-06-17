@@ -26,21 +26,3 @@ jobs:
         with:
           gradle-version: 7.6
           arguments: clean test build publish --stacktrace
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 10
-      - name: Upload kgraphql Test Results
-        uses: dorny/test-reporter@v1.9.1
-        if: success() || failure()
-        with:
-          name: Test Results
-          path: kgraphql/build/test-results/test/*.xml
-          reporter: java-junit
-      - name: Upload kgraphql-ktor Test Results
-        uses: dorny/test-reporter@v1.9.1
-        if: success() || failure()
-        with:
-          name: Test Results
-          path: kgraphql-ktor/build/test-results/test/*.xml
-          reporter: java-junit
