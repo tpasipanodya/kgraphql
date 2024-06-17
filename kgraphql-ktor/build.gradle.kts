@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm") version "1.8.0"
     kotlin("plugin.serialization") version "1.8.0"
     id("org.jetbrains.dokka") version "1.7.20"
+    id("maven-publish")
     signing
 }
 
@@ -69,37 +70,48 @@ val dokkaJar by tasks.creating(Jar::class) {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/tpasipanodya/kgraphql")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+
     publications {
         create<MavenPublication>("maven") {
             artifactId = project.name
             from(components["java"])
             artifact(sourcesJar)
             artifact(dokkaJar)
+
             pom {
                 name.set("KGraphQL")
                 description.set("KGraphQL is a Kotlin implementation of GraphQL. It provides a rich DSL to set up the GraphQL schema.")
-                url.set("https://kgraphql.io/")
-                organization {
-                    name.set("aPureBase")
-                    url.set("http://apurebase.com/")
-                }
+                url.set("https://github.com/tpasipanodya/kgraphql")
+
                 licenses {
                     license {
                         name.set("MIT License")
-                        url.set("https://github.com/aPureBase/KGraphQL/blob/main/LICENSE.md")
+                        url.set("https://github.com/tpasipanodya/kgraphql/blob/main/LICENSE.md")
                     }
                 }
+
                 developers {
                     developer {
-                        id.set("jeggy")
-                        name.set("Jógvan Olsen")
-                        email.set("jol@apurebase.com")
+                        id.set("pasitaf")
+                        name.set("Tafadzwa Pasipanodya")
+                        email.set("tmpasipanodya@gmail.com")
                     }
                 }
+
                 scm {
-                    connection.set("scm:git:https://github.com/aPureBase/KGraphQL.git")
-                    developerConnection.set("scm:git:https://github.com/aPureBase/KGraphQL.git")
-                    url.set("https://github.com/aPureBase/KGraphQL/")
+                    connection.set("scm:git:https://github.com/tpasipanodya/kgraphql.git")
+                    developerConnection.set("scm:git:https://github.com/tpasipanodya/kgraphql.git")
+                    url.set("https://github.com/tpasipanodya/kgraphql")
                     tag.set("HEAD")
                 }
             }
@@ -107,11 +119,3 @@ publishing {
     }
 }
 
-signing {
-    isRequired = isReleaseVersion
-    useInMemoryPgpKeys(
-        System.getenv("ORG_GRADLE_PROJECT_signingKey"),
-        System.getenv("ORG_GRADLE_PROJECT_signingPassword")
-    )
-    sign(publishing.publications["maven"])
-}
