@@ -23,7 +23,7 @@ allprojects {
 
 subprojects {
     group = "io.taff"
-    version = version
+    version = "$version${if(isReleaseBuild()) "" else "-SNAPSHOT"}"
 
 }
 
@@ -32,3 +32,5 @@ tasks {
         distributionType = Wrapper.DistributionType.ALL
     }
 }
+
+fun isReleaseBuild() = System.getenv("IS_RELEASE_BUILD")?.toBoolean() == true
