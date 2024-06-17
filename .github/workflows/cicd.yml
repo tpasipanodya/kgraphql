@@ -30,14 +30,14 @@ jobs:
           gradle-version: 7.6
           arguments: clean test build publish --stacktrace
       - name: Upload kgraphql Test Results
-        uses: dorny/test-reporter@v1.6.0
+        uses: dorny/test-reporter@v1.9.1
         if: success() || failure()
         with:
           name: Test Results
           path: kgraphql/build/test-results/test/*.xml
           reporter: java-junit
       - name: Upload kgraphql-ktor Test Results
-        uses: dorny/test-reporter@v1.6.0
+        uses: dorny/test-reporter@v1.9.1
         if: success() || failure()
         with:
           name: Test Results
