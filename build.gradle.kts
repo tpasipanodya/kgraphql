@@ -10,8 +10,8 @@ plugins {
 allprojects {
     repositories {
         maven {
-            name = "kdataloader"
-            url = uri("https://maven.pkg.github.com/tpasipanodya/kdataloader")
+            name = "deferred-json-builder"
+            url = uri("https://maven.pkg.github.com/tpasipanodya/deferred-json-builder")
             credentials {
                 username = System.getenv("PACKAGE_STORE_USERNAME")
                 password = System.getenv("PACKAGE_STORE_TOKEN")
