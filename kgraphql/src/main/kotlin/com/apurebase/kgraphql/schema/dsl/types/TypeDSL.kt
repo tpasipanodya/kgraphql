@@ -14,7 +14,7 @@ import kotlin.reflect.typeOf
 
 open class TypeDSL<T : Any>(
     private val supportedUnions: Collection<TypeDef.Union>,
-    val kClass: KClass<T>
+    val kClass: KClass<T>,
 ) : ItemDSL() {
 
     var name = kClass.defaultKQLTypeName()

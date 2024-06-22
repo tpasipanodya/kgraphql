@@ -29,7 +29,7 @@ class DataLoaderExecutionTest {
         query("items") {
             resolver { amount: Int? ->
                 println("query:items")
-                delay(Random.nextLong(50..250L))
+//                delay(Random.nextLong(50..250L))
                 (1..(amount ?: 1_000)).map(::Item)
             }
         }
@@ -40,7 +40,7 @@ class DataLoaderExecutionTest {
                 loader { ids ->
                     println("loader:name ${ids.size}")
                     coroutineScope {
-                        delay(Random.nextLong(1..15L))
+//                        delay(Random.nextLong(1..15L))
                         ids.map { ExecutionResult.Success("Name-$it")}
                     }
                 }

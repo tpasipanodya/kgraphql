@@ -24,6 +24,8 @@ data class SchemaConfiguration(
         val plugins: MutableMap<KClass<*>, Any>,
 
         val genericTypeResolver: GenericTypeResolver,
+
+        val propagateables: List<ThreadLocal<*>>
 ) {
         @Suppress("UNCHECKED_CAST")
         operator fun <T: Any> get(type: KClass<T>) = plugins[type] as T?

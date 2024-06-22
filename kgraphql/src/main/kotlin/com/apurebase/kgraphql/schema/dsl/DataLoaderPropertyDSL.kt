@@ -84,7 +84,8 @@ class DataLoaderPropertyDSL<T, K, R>(
             returnType = explicitReturnType ?: returnType,
             prepare = prepareWrapper!!,
             loader = TimedAutoDispatcherDataLoaderFactory(
-                { TimedAutoDispatcherDataLoaderOptions() },
+                {
+                    TimedAutoDispatcherDataLoaderOptions() },
                 mapOf(),
                 dataLoader!!,
             )

@@ -34,7 +34,6 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
 
     private suspend fun ExecutionPlan.constructLoaders(): Map<Field.DataLoader<*, *, *>, DataLoader<Any?, *>> = coroutineScope {
         val loaders = mutableMapOf<Field.DataLoader<*, *, *>, DataLoader<Any?, *>>()
-
         suspend fun Collection<Execution>.look() {
             forEach { ex ->
                 when (ex) {
@@ -42,7 +41,10 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
                     is Execution.Node -> {
                         ex.children.look()
                         if (ex.field is Field.DataLoader<*, *, *>) {
-                            loaders[ex.field] = ex.field.loader.constructNew(coroutineContext.job) as DataLoader<Any?, *>
+                            loaders[ex.field] = ex.field.loader.constructNew(
+                                coroutineContext.job,
+                                schema.configuration.propagateables
+                            ) as DataLoader<Any?, *>
                         }
                     }
                 }

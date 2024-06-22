@@ -3,21 +3,27 @@ package nidomiro.kdataloader
 import kotlinx.coroutines.*
 import nidomiro.kdataloader.statistics.SimpleStatisticsCollector
 import nidomiro.kdataloader.statistics.StatisticsCollector
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 
 open class SimpleDataLoaderImpl<K, R>(
     override val options: DataLoaderOptions<K, R>,
     private val statisticsCollector: StatisticsCollector,
-    private val batchLoader: BatchLoader<K, R>
+    private val batchLoader: BatchLoader<K, R>,
+    private val propagateables: List<ThreadLocal<*>>
 ) : DataLoader<K, R> {
-    constructor(options: DataLoaderOptions<K, R>, batchLoader: BatchLoader<K, R>) : this(
+    constructor(options: DataLoaderOptions<K, R>,
+                batchLoader: BatchLoader<K, R>,
+                propagateables: List<ThreadLocal<*>>) : this(
         options,
         SimpleStatisticsCollector(),
-        batchLoader
+        batchLoader,
+        propagateables
     )
 
-    constructor(batchLoader: BatchLoader<K, R>) : this(DataLoaderOptions(), batchLoader)
+    constructor(batchLoader: BatchLoader<K, R>, propagateables: List<ThreadLocal<*>>) : this(DataLoaderOptions(), batchLoader, propagateables)
 
-    private val dataLoaderScope = CoroutineScope(Dispatchers.Default)
+    private suspend fun dataLoaderScope() = CoroutineScope(Dispatchers.Default)
 
     private val queue: LoaderQueue<K, R> = DefaultLoaderQueueImpl()
 
@@ -54,14 +60,16 @@ open class SimpleDataLoaderImpl<K, R>(
 
         val deferreds = keys.map { internalLoadAsync(it) }
 
-        return dataLoaderScope.async(Dispatchers.Default) {
+        return  CoroutineScope(Dispatchers.Default).async {
             return@async deferreds.map { it.await() }
         }
     }
 
     @Suppress("DeferredResultUnused")
     override suspend fun dispatch() {
-        dataLoaderScope.launch {
+        val context = propagateables.map { it.asContextElement() }
+            .fold(Dispatchers.Default, CoroutineContext::plus)
+       dataLoaderScope().launch(context) {
             statisticsCollector.incDispatchMethodCalledAsync()
 
             val queueEntries = if (options.cache != null) {
