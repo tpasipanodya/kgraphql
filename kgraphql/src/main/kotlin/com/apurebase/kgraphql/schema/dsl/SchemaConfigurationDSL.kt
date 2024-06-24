@@ -9,6 +9,7 @@ import com.apurebase.kgraphql.schema.execution.Executor
 import com.apurebase.kgraphql.schema.execution.GenericTypeResolver
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KClass
 
 open class SchemaConfigurationDSL {
@@ -23,8 +24,7 @@ open class SchemaConfigurationDSL {
     var timeout: Long? = null
     var introspection: Boolean = true
     var genericTypeResolver: GenericTypeResolver = GenericTypeResolver.DEFAULT
-    var propagateables: List<ThreadLocal<*>> = listOf()
-//    var propagateableThreadLocals: List<ThreadLocal<*>> = listOf()
+    var propagateables: List<CoroutineContext.Element> = listOf()
 
     private val plugins: MutableMap<KClass<*>, Any> = mutableMapOf()
 

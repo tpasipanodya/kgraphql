@@ -10,18 +10,18 @@ open class SimpleDataLoaderImpl<K, R>(
     override val options: DataLoaderOptions<K, R>,
     private val statisticsCollector: StatisticsCollector,
     private val batchLoader: BatchLoader<K, R>,
-    private val propagateables: List<ThreadLocal<*>>
+    private val propagateables: List<CoroutineContext.Element>
 ) : DataLoader<K, R> {
     constructor(options: DataLoaderOptions<K, R>,
                 batchLoader: BatchLoader<K, R>,
-                propagateables: List<ThreadLocal<*>>) : this(
+                propagateables: List<CoroutineContext.Element>) : this(
         options,
         SimpleStatisticsCollector(),
         batchLoader,
         propagateables
     )
 
-    constructor(batchLoader: BatchLoader<K, R>, propagateables: List<ThreadLocal<*>>) : this(DataLoaderOptions(), batchLoader, propagateables)
+    constructor(batchLoader: BatchLoader<K, R>, propagateables: List<CoroutineContext.Element>) : this(DataLoaderOptions(), batchLoader, propagateables)
 
     private suspend fun dataLoaderScope() = CoroutineScope(Dispatchers.Default)
 
@@ -67,8 +67,7 @@ open class SimpleDataLoaderImpl<K, R>(
 
     @Suppress("DeferredResultUnused")
     override suspend fun dispatch() {
-        val context = propagateables.map { it.asContextElement() }
-            .fold(Dispatchers.Default, CoroutineContext::plus)
+        val context = propagateables.fold(Dispatchers.Default, CoroutineContext::plus)
        dataLoaderScope().launch(context) {
             statisticsCollector.incDispatchMethodCalledAsync()
 

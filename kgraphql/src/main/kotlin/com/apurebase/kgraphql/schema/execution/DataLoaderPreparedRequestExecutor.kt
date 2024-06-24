@@ -346,22 +346,23 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
     }
 
     override suspend fun suspendExecute(plan: ExecutionPlan, variables: VariablesJson, context: Context) = coroutineScope {
-        val result = deferredJsonBuilder(timeout = plan.options.timeout ?: schema.configuration.timeout) {
-            val ctx = ExecutionContext(
-                Variables(schema, variables, plan.firstOrNull { it.variables != null }?.variables),
-                context,
-                plan.constructLoaders(),
-            )
+        val result =
+            deferredJsonBuilder(timeout = plan.options.timeout ?: schema.configuration.timeout,
+                propagateables = schema.configuration.propagateables) {
+                val ctx = ExecutionContext(
+                    Variables(schema, variables, plan.firstOrNull { it.variables != null }?.variables),
+                    context,
+                    plan.constructLoaders()
+                )
 
 
-            "data" toDeferredObj {
-                plan.forEach { node ->
-                    if (shouldInclude(ctx, node)) writeOperation(ctx, node, node.field as Field.Function<*, *>)
+                "data" toDeferredObj {
+                    plan.forEach { node ->
+                        if (shouldInclude(ctx, node)) writeOperation(ctx, node, node.field as Field.Function<*, *>)
+                    }
                 }
+                ctx.loaders.values.map { it.dispatch() }
             }
-            ctx.loaders.values.map { it.dispatch() }
-        }
-
         result.await().toString()
     }
 

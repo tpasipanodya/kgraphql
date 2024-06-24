@@ -10,7 +10,7 @@ class TimedAutoDispatcherImpl<K, R>(
     options: TimedAutoDispatcherDataLoaderOptions<K, R>,
     batchLoader: BatchLoader<K, R>,
     parent: Job? = null,
-    propagateables: List<ThreadLocal<*>>
+    propagateables: List<CoroutineContext.Element>
 ) : SimpleDataLoaderImpl<K, R>(options, SimpleStatisticsCollector(), batchLoader, propagateables), CoroutineScope {
 
     private val autoChannel = Channel<Unit>()
@@ -19,8 +19,10 @@ class TimedAutoDispatcherImpl<K, R>(
     val dataLoaderDispatcher = newSingleThreadContext("CounterContext")
 
     init {
-        val context = propagateables.map { it.asContextElement() }
-            .fold(CoroutineName("TimedAutoDispatcherImpl:init"), CoroutineContext::plus)
+        val context = propagateables.fold(
+            CoroutineName("TimedAutoDispatcherImpl:init"),
+            CoroutineContext::plus
+        )
         launch(context) {
             var job: Job? = null
             while (true) {
