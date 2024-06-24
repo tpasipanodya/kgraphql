@@ -1,6 +1,4 @@
 val version: String by project
-val sonatypeUsername: String? = System.getenv("sonatypeUsername")
-val sonatypePassword: String? = System.getenv("sonatypePassword")
 
 plugins {
     id("com.github.ben-manes.versions") version "0.51.0"
