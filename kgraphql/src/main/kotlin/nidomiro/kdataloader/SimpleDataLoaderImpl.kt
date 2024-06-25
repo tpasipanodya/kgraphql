@@ -67,7 +67,8 @@ open class SimpleDataLoaderImpl<K, R>(
 
     @Suppress("DeferredResultUnused")
     override suspend fun dispatch() {
-        val context = propagateables.fold(Dispatchers.Default, CoroutineContext::plus)
+        val inital: CoroutineContext = Dispatchers.Default
+        val context = propagateables.fold(inital) { sum, curr -> sum + curr() }
        dataLoaderScope().launch(context) {
             statisticsCollector.incDispatchMethodCalledAsync()
 

@@ -19,10 +19,8 @@ class TimedAutoDispatcherImpl<K, R>(
     val dataLoaderDispatcher = newSingleThreadContext("CounterContext")
 
     init {
-        val context = propagateables.fold(
-            CoroutineName("TimedAutoDispatcherImpl:init"),
-            CoroutineContext::plus
-        )
+        val initial: CoroutineContext = CoroutineName("TimedAutoDispatcherImpl:init")
+        val context = propagateables.fold(initial) { sum, curr -> sum + curr() }
         launch(context) {
             var job: Job? = null
             while (true) {
