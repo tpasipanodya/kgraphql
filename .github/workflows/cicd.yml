@@ -26,6 +26,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IS_RELEASE_BUILD: true
+          PACKAGE_STORE_USERNAME: ${{ secrets.PACKAGE_STORE_USERNAME }}
+          PACKAGE_STORE_TOKEN: ${{ secrets.PACKAGE_STORE_TOKEN }}
         with:
           gradle-version: 8.4
           arguments: clean test build publish --stacktrace
