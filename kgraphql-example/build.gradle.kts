@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     base
     application
-    kotlin("jvm") version "1.8.0"
-    id("org.jetbrains.dokka") version "1.7.20"
+    kotlin("jvm") version "2.0.0"
+    id("org.jetbrains.dokka") version "1.9.20"
     id("maven-publish")
     signing
 }
@@ -35,17 +37,13 @@ dependencies {
 
 
 tasks {
-    compileKotlin { kotlinOptions { jvmTarget = JavaVersion.VERSION_11.toString() } }
-    compileTestKotlin { kotlinOptions { jvmTarget = JavaVersion.VERSION_11.toString() } }
-
-    test {
-        useJUnitPlatform()
-    }
+    kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_20) } }
+    test { useJUnitPlatform() }
     dokkaHtml {
-        outputDirectory.set(buildDir.resolve("javadoc"))
+        outputDirectory.set(layout.buildDirectory.dir("javadoc"))
         dokkaSourceSets {
             configureEach {
-                jdkVersion.set(11)
+                jdkVersion.set(20)
                 reportUndocumented.set(true)
                 platform.set(org.jetbrains.dokka.Platform.jvm)
             }
@@ -54,13 +52,13 @@ tasks {
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
 }
 
 val dokkaJar by tasks.creating(Jar::class) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from(tasks.dokkaHtml)
 }
 
@@ -86,12 +84,12 @@ publishing {
             pom {
                 name.set("KGraphQL")
                 description.set("KGraphQL is a Kotlin implementation of GraphQL. It provides a rich DSL to set up the GraphQL schema.")
-                url.set("https://github.com/tpasipanodya/tpasipanodya/kgraphql")
+                url.set("https://github.com/tpasipanodya/kgraphql")
 
                 licenses {
                     license {
                         name.set("MIT License")
-                        url.set("https://github.com/tpasipanodya/tpasipanodya/kgraphql/blob/main/LICENSE.md")
+                        url.set("https://github.com/tpasipanodya/kgraphql/blob/main/LICENSE.md")
                     }
                 }
 
@@ -104,9 +102,9 @@ publishing {
                 }
 
                 scm {
-                    connection.set("scm:git:https://github.com/tpasipanodya/tpasipanodya/kgraphql.git")
-                    developerConnection.set("scm:git:https://github.com/tpasipanodya/tpasipanodya/kgraphql.git")
-                    url.set("https://github.com/tpasipanodya/tpasipanodya/kgraphql")
+                    connection.set("scm:git:https://github.com/tpasipanodya/kgraphql.git")
+                    developerConnection.set("scm:git:https://github.com/tpasipanodya/kgraphql.git")
+                    url.set("https://github.com/tpasipanodya/kgraphql")
                     tag.set("HEAD")
                 }
             }

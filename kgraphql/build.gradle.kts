@@ -1,8 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     base
-    kotlin("jvm") version "1.8.0"
-    id("org.jetbrains.dokka") version "1.7.20"
+    kotlin("jvm") version "2.0.0"
+    id("org.jetbrains.dokka") version "1.9.20"
     id("maven-publish")
     signing
 }
@@ -34,10 +35,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version")
 
     implementation("com.github.ben-manes.caffeine:caffeine:$caffeine_version")
-    implementation("com.apurebase:DeferredJsonBuilder:$deferredJsonBuilder_version")
+    implementation("io.taff:deferred-json-builder:$deferredJsonBuilder_version")
 
 //    api("de.nidomiro:KDataLoader:$kDataLoader_version")
-
 
     testImplementation("io.netty:netty-all:$netty_version")
     testImplementation("org.hamcrest:hamcrest:$hamcrest_version")
@@ -50,23 +50,20 @@ dependencies {
 }
 
 tasks {
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_11.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_20)
         }
-    }
-    compileTestKotlin {
-        kotlinOptions { jvmTarget = JavaVersion.VERSION_11.toString() }
     }
 
     test {
         useJUnitPlatform()
     }
     dokkaHtml {
-        outputDirectory.set(buildDir.resolve("javadoc"))
+        outputDirectory.set(layout.buildDirectory.dir("javadoc"))
         dokkaSourceSets {
             configureEach {
-                jdkVersion.set(11)
+                jdkVersion.set(20)
                 reportUndocumented.set(true)
                 platform.set(org.jetbrains.dokka.Platform.jvm)
             }
@@ -75,13 +72,13 @@ tasks {
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
 }
 
 val dokkaJar by tasks.creating(Jar::class) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from(tasks.dokkaHtml)
 }
 
@@ -107,7 +104,7 @@ publishing {
             pom {
                 name.set("kgraphql")
                 description.set("KGraphQL is a Kotlin implementation of GraphQL. It provides a rich DSL to set up the GraphQL schema.")
-                url.set("https://github.com/tpasipanodya/tpasipanodya/kgraphql")
+                url.set("https://github.com/tpasipanodya/kgraphql")
 
                 licenses {
                     license {

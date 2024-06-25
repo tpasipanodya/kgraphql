@@ -3,12 +3,15 @@ package nidomiro.kdataloader
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import nidomiro.kdataloader.statistics.SimpleStatisticsCollector
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 class TimedAutoDispatcherImpl<K, R>(
     options: TimedAutoDispatcherDataLoaderOptions<K, R>,
     batchLoader: BatchLoader<K, R>,
     parent: Job? = null,
-) : SimpleDataLoaderImpl<K, R>(options, SimpleStatisticsCollector(), batchLoader), CoroutineScope {
+    propagateables: List<() -> CoroutineContext.Element>
+) : SimpleDataLoaderImpl<K, R>(options, SimpleStatisticsCollector(), batchLoader, propagateables), CoroutineScope {
 
     private val autoChannel = Channel<Unit>()
     override val coroutineContext = Job(parent)
@@ -16,7 +19,9 @@ class TimedAutoDispatcherImpl<K, R>(
     val dataLoaderDispatcher = newSingleThreadContext("CounterContext")
 
     init {
-        launch(CoroutineName("TimedAutoDispatcherImpl:init")) {
+        val initial: CoroutineContext = CoroutineName("TimedAutoDispatcherImpl:init")
+        val context = propagateables.fold(initial) { sum, curr -> sum + curr() }
+        launch(context) {
             var job: Job? = null
             while (true) {
                 autoChannel.receive()

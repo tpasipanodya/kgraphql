@@ -1,9 +1,9 @@
 # KGraphQL
-[![Maven Central](https://img.shields.io/maven-central/v/com.apurebase/kgraphql.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.apurebase%22%20AND%20a:%22kgraphql%22)
-[![Awesome Kotlin Badge](https://kotlin.link/awesome-kotlin.svg)](https://github.com/KotlinBy/awesome-kotlin)
-[![Chat](https://img.shields.io/badge/chat-on%20slack-green.svg)](https://kotlinlang.slack.com/messages/kgraphql)
 
 KGraphQL is a [Kotlin](https://kotlinlang.org/) implementation of [GraphQL](http://graphql.org/). It provides a rich DSL to set up the GraphQL schema.
+Unlike [aPureBase's original implementation](https://github.com/aPureBase/KGraphQL), this fork allows you to propagate
+select Coroutine context elements across all Coroutines. An example use-case for this is propagating
+ThreadLocalContextElement that are required for use in data fetching operations.
 
 
 ```kotlin
@@ -37,29 +37,16 @@ fun main() {
 ```
 
 ## Documentation
+
 See the [documentation](https://kgraphql.io/) for a more detailed explanation of the library.
 
 ## Contributing
 
 All contributions are welcome. Feel free to open issues and PRs!
 
-## Building
-
-To build KGraphQL you only need to have JDK8 installed. invoke
-
-```bash
-./gradlew build
-```
-
-To perform local build.
-
 ## Versioning
 
 The versioning is following [Semantic Versioning](http://semver.org/)
-
-## Links
-
-Specification : http://facebook.github.io/graphql/
 
 ## License
 

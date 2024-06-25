@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     base
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "2.0.0"
     kotlin("plugin.serialization") version "1.8.0"
-    id("org.jetbrains.dokka") version "1.7.20"
+    id("org.jetbrains.dokka") version "1.9.20"
     id("maven-publish")
     signing
 }
@@ -22,7 +24,6 @@ val junit_version: String by project
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
 
-
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     api(project(":kgraphql"))
@@ -40,17 +41,14 @@ dependencies {
 
 
 tasks {
-    compileKotlin { kotlinOptions { jvmTarget = JavaVersion.VERSION_11.toString() } }
-    compileTestKotlin { kotlinOptions { jvmTarget = JavaVersion.VERSION_11.toString() } }
+    kotlin  { compilerOptions { jvmTarget.set(JvmTarget.JVM_20) } }
 
-    test {
-        useJUnitPlatform()
-    }
+    test { useJUnitPlatform() }
     dokkaHtml {
         outputDirectory.set(buildDir.resolve("javadoc"))
         dokkaSourceSets {
             configureEach {
-                jdkVersion.set(11)
+                jdkVersion.set(20)
                 reportUndocumented.set(true)
                 platform.set(org.jetbrains.dokka.Platform.jvm)
             }
@@ -59,13 +57,13 @@ tasks {
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
 }
 
 val dokkaJar by tasks.creating(Jar::class) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from(tasks.dokkaHtml)
 }
 

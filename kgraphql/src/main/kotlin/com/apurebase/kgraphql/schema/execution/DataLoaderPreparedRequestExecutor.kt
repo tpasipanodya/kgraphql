@@ -34,7 +34,6 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
 
     private suspend fun ExecutionPlan.constructLoaders(): Map<Field.DataLoader<*, *, *>, DataLoader<Any?, *>> = coroutineScope {
         val loaders = mutableMapOf<Field.DataLoader<*, *, *>, DataLoader<Any?, *>>()
-
         suspend fun Collection<Execution>.look() {
             forEach { ex ->
                 when (ex) {
@@ -42,7 +41,10 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
                     is Execution.Node -> {
                         ex.children.look()
                         if (ex.field is Field.DataLoader<*, *, *>) {
-                            loaders[ex.field] = ex.field.loader.constructNew(coroutineContext.job) as DataLoader<Any?, *>
+                            loaders[ex.field] = ex.field.loader.constructNew(
+                                coroutineContext.job,
+                                schema.configuration.propagateables
+                            ) as DataLoader<Any?, *>
                         }
                     }
                 }
@@ -344,22 +346,23 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
     }
 
     override suspend fun suspendExecute(plan: ExecutionPlan, variables: VariablesJson, context: Context) = coroutineScope {
-        val result = deferredJsonBuilder(timeout = plan.options.timeout ?: schema.configuration.timeout) {
-            val ctx = ExecutionContext(
-                Variables(schema, variables, plan.firstOrNull { it.variables != null }?.variables),
-                context,
-                plan.constructLoaders(),
-            )
+        val result =
+            deferredJsonBuilder(timeout = plan.options.timeout ?: schema.configuration.timeout,
+                propagateables = schema.configuration.propagateables) {
+                val ctx = ExecutionContext(
+                    Variables(schema, variables, plan.firstOrNull { it.variables != null }?.variables),
+                    context,
+                    plan.constructLoaders()
+                )
 
 
-            "data" toDeferredObj {
-                plan.forEach { node ->
-                    if (shouldInclude(ctx, node)) writeOperation(ctx, node, node.field as Field.Function<*, *>)
+                "data" toDeferredObj {
+                    plan.forEach { node ->
+                        if (shouldInclude(ctx, node)) writeOperation(ctx, node, node.field as Field.Function<*, *>)
+                    }
                 }
+                ctx.loaders.values.map { it.dispatch() }
             }
-            ctx.loaders.values.map { it.dispatch() }
-        }
-
         result.await().toString()
     }
 

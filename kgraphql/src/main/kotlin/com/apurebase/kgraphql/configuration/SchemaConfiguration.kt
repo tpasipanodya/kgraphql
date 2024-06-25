@@ -4,6 +4,7 @@ import com.apurebase.kgraphql.schema.execution.Executor
 import com.apurebase.kgraphql.schema.execution.GenericTypeResolver
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KClass
 
 data class SchemaConfiguration(
@@ -24,6 +25,8 @@ data class SchemaConfiguration(
         val plugins: MutableMap<KClass<*>, Any>,
 
         val genericTypeResolver: GenericTypeResolver,
+
+        val propagateables: List<() -> CoroutineContext.Element>
 ) {
         @Suppress("UNCHECKED_CAST")
         operator fun <T: Any> get(type: KClass<T>) = plugins[type] as T?
