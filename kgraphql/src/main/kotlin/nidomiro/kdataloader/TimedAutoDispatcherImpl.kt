@@ -10,7 +10,7 @@ class TimedAutoDispatcherImpl<K, R>(
     options: TimedAutoDispatcherDataLoaderOptions<K, R>,
     batchLoader: BatchLoader<K, R>,
     parent: Job? = null,
-    propagateables: List<CoroutineContext.Element>
+    propagateables: List<() -> CoroutineContext.Element>
 ) : SimpleDataLoaderImpl<K, R>(options, SimpleStatisticsCollector(), batchLoader, propagateables), CoroutineScope {
 
     private val autoChannel = Channel<Unit>()

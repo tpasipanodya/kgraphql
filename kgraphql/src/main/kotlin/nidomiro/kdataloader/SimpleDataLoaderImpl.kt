@@ -10,18 +10,18 @@ open class SimpleDataLoaderImpl<K, R>(
     override val options: DataLoaderOptions<K, R>,
     private val statisticsCollector: StatisticsCollector,
     private val batchLoader: BatchLoader<K, R>,
-    private val propagateables: List<CoroutineContext.Element>
+    private val propagateables: List<() -> CoroutineContext.Element>
 ) : DataLoader<K, R> {
     constructor(options: DataLoaderOptions<K, R>,
                 batchLoader: BatchLoader<K, R>,
-                propagateables: List<CoroutineContext.Element>) : this(
+                propagateables: List<() -> CoroutineContext.Element>) : this(
         options,
         SimpleStatisticsCollector(),
         batchLoader,
         propagateables
     )
 
-    constructor(batchLoader: BatchLoader<K, R>, propagateables: List<CoroutineContext.Element>) : this(DataLoaderOptions(), batchLoader, propagateables)
+    constructor(batchLoader: BatchLoader<K, R>, propagateables: List<() -> CoroutineContext.Element>) : this(DataLoaderOptions(), batchLoader, propagateables)
 
     private suspend fun dataLoaderScope() = CoroutineScope(Dispatchers.Default)
 

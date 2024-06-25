@@ -24,7 +24,7 @@ open class SchemaConfigurationDSL {
     var timeout: Long? = null
     var introspection: Boolean = true
     var genericTypeResolver: GenericTypeResolver = GenericTypeResolver.DEFAULT
-    var propagateables: List<CoroutineContext.Element> = listOf()
+    var propagateables: List<() -> CoroutineContext.Element> = listOf()
 
     private val plugins: MutableMap<KClass<*>, Any> = mutableMapOf()
 

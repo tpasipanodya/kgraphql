@@ -26,7 +26,7 @@ data class SchemaConfiguration(
 
         val genericTypeResolver: GenericTypeResolver,
 
-        val propagateables: List<CoroutineContext.Element>
+        val propagateables: List<() -> CoroutineContext.Element>
 ) {
         @Suppress("UNCHECKED_CAST")
         operator fun <T: Any> get(type: KClass<T>) = plugins[type] as T?
