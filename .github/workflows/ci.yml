@@ -17,12 +17,12 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: 11
+          java-version: 20
       - name: Build & Deploy
         uses: gradle/gradle-build-action@v2.4.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IS_RELEASE_BUILD: false
         with:
-          gradle-version: 7.6
+          gradle-version: 8.4
           arguments: clean test build publish --stacktrace
